@@ -1,0 +1,40 @@
+// send calldata -> function dispatch -> function
+// Bytecode from define: 60008060093d393df3 >> 60 00 80 60....
+// 60008060093d393df3 => Contract Creation Bytecode
+// XXX??              => Runtime Bytecode
+// xxxxx              => Metadata Bytecode
+
+// Our input: 0xcdfead2e0000000000000000000000000000000000000000000000000000000000000001
+// Let s find the function selector  >>> route to the code htat update horses
+#define macro MAIN() = takes(0) returns(0) {
+    // 0x00            // [0]
+    // // 0x02        // TOP [2,0] BOTTOM
+    // calldataload   // [calldata] >> notice 0x00 is gone from the stack
+    // // Now we have the all call data, but: how we cutdown the call deta to get funct selector?
+    // // We want the first 4 bytes
+    // // we have Input = 32 bytes = 64 -8 = 56 >> 56/2 = 28 bytes >> 28 * 8 = 224 bits
+    // // Shift right of 224 bits >> we need to know the Hex value
+    // // cast 224 hex = 0xe0 >> PUSH1 0xe0
+    // 0xe0            // [0xe0, calldata(32)]
+    // shr             // [Function Selector (4)]
+    //// In one line
+    0x00 calldataload 0xe0 shr // [function slector (4)]
+    
+
+
+
+
+
+
+    /*
+    SHR Opcode
+    Example: 0x0102 (this is in bytes: 01= 1 byte 02= 1 byte)
+    1 byte = 8 bits
+    SHR input 1 = number of bits to shift to the right
+    cast 0x0102 = 0b100000010
+    >> 2 >> 0b01000000 >> 0x40 >> 64
+    >> 4 >> 0b010000 >> 0x10 >> 16
+    */
+
+
+}

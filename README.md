@@ -1,6 +1,13 @@
 # Horse Store
 1. write basic simplestorage/horsestore
 
+#### Process
+1. Isend the data
+2. dispacher selects the function
+3. dispacher sends the data to the funciton
+
+
+
 
 -   **Chisel**: Fast, utilitarian, and verbose 
 ## Documentation

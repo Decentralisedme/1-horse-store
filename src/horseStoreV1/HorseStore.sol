@@ -13,3 +13,11 @@ contract HorseStore {
         return numberOfHorses;
     }
 }
+/*
+FROM Remix
+- Input: 0xcdfead2e0000000000000000000000000000000000000000000000000000000000000001
+
+ 1. Where did this data come from?
+ 2. How Remix knows what has to be updated?
+
+*/

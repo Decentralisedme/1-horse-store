@@ -6,7 +6,7 @@
 2. dispacher selects the function
 3. dispacher sends the data to the funciton
 
-
+We ne
 
 
 -   **Chisel**: Fast, utilitarian, and verbose 

@@ -6,25 +6,45 @@
 
 // Our input: 0xcdfead2e0000000000000000000000000000000000000000000000000000000000000001
 // Let s find the function selector  >>> route to the code htat update horses
-#define macro MAIN() = takes(0) returns(0) {
-    // 0x00            // [0]
-    // // 0x02        // TOP [2,0] BOTTOM
-    // calldataload   // [calldata] >> notice 0x00 is gone from the stack
-    // // Now we have the all call data, but: how we cutdown the call deta to get funct selector?
-    // // We want the first 4 bytes
-    // // we have Input = 32 bytes = 64 -8 = 56 >> 56/2 = 28 bytes >> 28 * 8 = 224 bits
-    // // Shift right of 224 bits >> we need to know the Hex value
-    // // cast 224 hex = 0xe0 >> PUSH1 0xe0
-    // 0xe0            // [0xe0, calldata(32)]
-    // shr             // [Function Selector (4)]
-    //// In one line
-    0x00 calldataload 0xe0 shr // [function slector (4)]
-    
+// #define macro MAIN() = takes(0) returns(0) {
+//     // 0x00            // [0]
+//     // // 0x02        // TOP [2,0] BOTTOM
+//     // calldataload   // [calldata] >> notice 0x00 is gone from the stack
+//     // // Now we have the all call data, but: how we cutdown the call deta to get funct selector?
+//     // // We want the first 4 bytes
+//     // // we have Input = 32 bytes = 64 -8 = 56 >> 56/2 = 28 bytes >> 28 * 8 = 224 bits
+//     // // Shift right of 224 bits >> we need to know the Hex value
+//     // // cast 224 hex = 0xe0 >> PUSH1 0xe0
+//     // 0xe0            // [0xe0, calldata(32)]
+//     // shr             // [Function Selector (4)]
+//     //// In one line
+//     0x00 calldataload 0xe0 shr // [funct_slector (4)]
+//     // Jump => to the function given by the selector 
+//     // If f_selctor == updateHorseNumber  => JUMP to the code: 0xcdfead2e
+//     // If f_selctor == readNumberOfHorses  => JUMP to the code: 0xe026c017
+//     // 0xcdfead2e = update
+//     // 0xe026c017 = read
+//     dup1                      // [funct_slector, funct_slector] // dupicate 1st itme on stack
+//     0xcdfead2e                 // [0xcdfead2e, funct_selector, funct_slector]
+//     eq                         // [true_if_funct_slector_matches, funct_slector]
+//     // jump destination to updateHorseNumber code if true
+//     updateJump                 // [updateHorseNumberProgramCounter, true/false, funct_slector]
+//     jumpi                      // [funct_slector] >> it should have been empty, but have funct_slector now
 
-
-
-
-
+//     // Need to consider the other function and push the sig to stack
+//     0xe026c017                  // [0xe026c017, funct_slector]
+//     eq                          // [true_if_funct_slector_matches]
+//      // jump destination to readNumber code if true
+//     readJump                    // [readNumberOfHorsesProgramCounter, true_if_funct_slector_matches]
+//     jumpi                       // [] >> new is empty, we have only 2 functions
+//     0x00 0x00 revert 
+//     updateJump:
+//         SET_NUMBER_OF_HORSES()
+//
+//     readJump:
+//         GET_NUMBER_OF_HORSES()
+//
+// }
 
     /*
     SHR Opcode
@@ -34,7 +54,52 @@
     cast 0x0102 = 0b100000010
     >> 2 >> 0b01000000 >> 0x40 >> 64
     >> 4 >> 0b010000 >> 0x10 >> 16
-    */
+*/ /*/
 
+*/
+
+/*Interface*/
+#define function updateHorseNumber(uint256) nonpayable returns() 
+#define function readNumberOfHorses() nonpayable returns(uint256) 
+
+// Free Pointer to assign the slot number
+#define constant NUMBER_OF_STORAGE_SLOT = FREE_STORAGE_POINTER() // 0
+
+#define macro MAIN() = takes(0) returns(0) {
+    0x00 calldataload 0xe0 shr // [funct_slector (4)]
+    // updateHorseNumber = 0xcdfead2e
+    dup1 __FUNC_SIG(updateHorseNumber) eq updateJump jumpi
+    // readNumberOfHorses = 0xe026c017
+    __FUNC_SIG(readNumberOfHorses) eq readJump jumpi
+    0x00 0x00 revert
+
+    updateJump:
+        SET_NUMBER_OF_HORSES()
+
+    readJump:
+        GET_NUMBER_OF_HORSES()
+}
+
+#define macro SET_NUMBER_OF_HORSES() = takes(0) returns(0) {
+    // Store Num of horse SSTORE Key/Value >> key on top of stak, value goes in firs
+    // 1. Get Value to store form calldata
+    0x04                            // [4] >> in this case 4 bytes (which is the function)
+    calldataload                    // [value] >> calldata-valueWe left with 00000...001 or 7 whatver horse number   
+    // 2. Give it a storage slot 
+    [NUMBER_OF_STORAGE_SLOT]        // [storage_slot, value]= Now in stack we have Key + Value
+    // 3. No we can Call sstore opcode
+    sstore
+    stop
 
 }
+
+#define macro GET_NUMBER_OF_HORSES() = takes(0) returns(0) {
+    [ NUMBER_OF_STORAGE_SLOT]           // [key]
+    sload                               // [value]
+    0x00                                // [00, value] >> the 00 is the index for memory, but we do not have anything there >> 0
+    mstore                              // stack: [] // memory: [value] >> we can call it using return
+    0x20 0x00                           // stack: [size, offset]
+    return                              // []
+}
+
+

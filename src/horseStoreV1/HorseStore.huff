@@ -66,12 +66,24 @@
 #define constant NUMBER_OF_STORAGE_SLOT = FREE_STORAGE_POINTER() // 0
 
 #define macro MAIN() = takes(0) returns(0) {
-    0x00 calldataload 0xe0 shr // [funct_slector (4)]
+    0x00 
+    calldataload 
+    0xe0        // amount to be shifted -28 bytes
+    shr         // [funct_slector (4)]
     // updateHorseNumber = 0xcdfead2e
-    dup1 __FUNC_SIG(updateHorseNumber) eq updateJump jumpi
+    dup1 
+    __FUNC_SIG(updateHorseNumber) 
+    eq 
+    updateJump 
+    jumpi       // ProgramControl: counts/tells wehere to jump
     // readNumberOfHorses = 0xe026c017
-    __FUNC_SIG(readNumberOfHorses) eq readJump jumpi
-    0x00 0x00 revert
+    __FUNC_SIG(readNumberOfHorses) 
+    eq 
+    readJump 
+    jumpi
+    0x00 
+    0x00 
+    revert
 
     updateJump:
         SET_NUMBER_OF_HORSES()

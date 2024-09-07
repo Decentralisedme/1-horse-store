@@ -7,7 +7,11 @@ We know there ae 3 sections;
 2. Runtime
 3. Metadata
 */
-// --- 1. Creation Creation
+
+////////////////////////
+// 1. Creation Creation
+////////////////////////
+
 // Free Memory Pointer: this always at the start
 PUSH1 0x80; // [80]                             // 60 80
 PUSH1 0x40; // [80, 40]                         // 60 40
@@ -39,18 +43,25 @@ RETURN;     // f3 //    [] // Output: returns item from from Memory
 
 INVALID;    // fe //
 
-// --- 2. Runtimne Code: 6080604052348015600e575f80fd5b50600436106030575f3560e01c8063cdfead2e146034578063e026c017146045575b5f80fd5b6043603f3660046059565b5f55565b005b5f5460405190815260200160405180910390f35b5f602082840312156068575f80fd5b503591905056fea264697066735822122011b56db01e1ad1287f59cded991b43104213badb339d81e88e5d1f07f690692864736f6c634300081a0033
+////////////////////
+//  2. Runtimne Code: 
+////////////////////
+
+// Data: 6080604052348015600e575f80fd5b50600436106030575f3560e01c8063cdfead2e146034578063e026c017146045575b5f80fd5b6043603f3660046059565b5f55565b005b5f5460405190815260200160405180910390f35b5f602082840312156068575f80fd5b503591905056fea264697066735822122011b56db01e1ad1287f59cded991b43104213badb339d81e88e5d1f07f690692864736f6c634300081a0033
+// calldata: 0xcdfead2e0000000000000000000000000000000000000000000000000000000000000007 
+
 // 2.a Free Memoery Pointer 
 PUSH1 0x80; // 60 0x80 //   [0x80]
 PUSH1 0x40; // 60 0x40 //   [0x40,0x80]
 MSTORE;     // 53 //        [] >> set free memory pointer
 
-// 2.b 
+// 2.b:check no value has been sent
 CALLVALUE;  // 34 //        [msg.value] // msg.value == 0
 DUP1;       // 80 //        [msg.value, msg.value]
 ISZERO;     // 15 //        [msg.value ==0, msg.value, msg.value] // yes it is zer >> 1 in the stuck
 PUSH1 0x0e; // 60 0x0e //   [0x0e, msg.value ==0?, msg.value] // need to tell where to jump PC
 JUMPI;      // 57 //        [msg.value]  // If 1>> Jump to 0x0e JUMPDEST, (here=1=we jump)
+// We JUMP: we did not sent any value iszer YES >> =1 / Jumpif >< 0, 1><0 >> JUMP to e
 PUSH0;      // 5f //        [0x00, msg.value]
 DUP1;       // 80 //        [0x00, 0x00, msg.value]
 REVERT;     // fd //        [msg.value]
@@ -60,23 +71,24 @@ REVERT;     // fd //        [msg.value]
 // This checks if there is enough data for Function_Selector, the least is 0x04 (8bites), if is less (LT) >> Jump 
 JUMPDEST;   // 5B //        [msg.value] >> Value before JUMPI
 POP;        // 50 //        []
-PUSH1 0x04; // 60 0x40 //   [0x40] 
-CALLDATASIZE; // 36 //      [colldata_size, 0x40]
-LT;          // 10 //       [colldata_size < 0x40] compare if a<b then 1 (true)
-PUSH1 0x30;  // 60 0x30 //  [0x30, colldata_size < 0x40]
-JUMPI;       // 57 //       [] >> Jump if condition colldata_size < 0x40 is true (1): Ifa calldata is small we jump
-// If calldata_size <0x04 (means no function to select) then >>>> calldata_jump to 0x30
-
+PUSH1 0x04; // 60 0x40 //   [0x04] 
+CALLDATASIZE; // 36 //      [colldata_size, 0x04] /// size  = 24 bytes = 4 (function) + 20 (number 7 is 32 bytes)
+LT;          // 10 //       [colldata_size < 0x04] compare a<b is TRUE then 1 / compare a<b is FALSE then 0: 24<4 >> FALOS  = 0 
+// [0x24 < 0x04] >>LT [0]
+PUSH1 0x30;  // 60 0x30 //  [0x30, 0x00]
+JUMPI;       // 57 //       [] >> Jump if  >< 0: condition colldata_size < 0x40 is FALSE (0): so =0 >> NO JUMP
+// WE DID NOT JUMP
 // 2.D: Function Dispacher >> UpdateNumbOfHorses
 PUSH0;       // 5f //       [0x00]
-CALLDATALOAD;// 35 //       [32bytes of calldata]      
-PUSH1 0xe0;  // 60 e0 //    [0xe0, 32bytes of calldata]
-SHR;         // 1C //       [calldata[0:4]] ?? we have selected the function
+CALLDATALOAD;// 35 //       [32bytes of calldata] = cdfead2e00000000000000000000000000000000000000000000000000000000 
+PUSH1 0xe0;  // 60 e0 //    [0xe0, 32bytes of calldata]  == 
+SHR;         // 1C //       [calldata[0:4]] ?? we have selected the function [cdfead2e]
 DUP1;        // 80 //       [calldata[0:4], calldata[0:4]]    
 PUSH4 0xcdfead2e; // 63 cdfead2e // [0xcdfead2e, calldata[0:4], calldata[0:4]] Push 4 bytes, whihc is our fucntion
-EQ;          // 14 //            [0xcdfead2e==calldata[0:4],calldata[0:4]]
-PUSH1 0x34; // 60 34 //          [0x34, 0xcdfead2e==calldata[0:4], calldata[0:4]]
-JUMPI;      // 57 //             [calldata[0:4]]    if calldata[0:4] = 0xcdfead2e >> JUMP 0x34 (updateNumberOfHorses) JUMP to Progrm Counter 0x034
+EQ;          // 14 //            [0xcdfead2e==calldata[0:4],calldata[0:4]]  >> calldata[0:4] is 0xcdfead2e so [1,0xcdfead2e ]
+PUSH1 0x34; // 60 34 //          [0x34, 1, 0xcdfead2e]
+JUMPI;      // 57 //             [0xcdfead2e]    if calldata[0:4] = 0xcdfead2e >> JUMP 0x34 (updateNumberOfHorses) JUMP to Progrm Counter 0x034
+// WE JUMP: jump if >< 0:it is cose  EQ = 1  
 
 // 2.E Function Dispacher >> readNumbOfHorse
 DUP1;       // 80 //            [calldata[0:4],calldata[0:4]] >> in Huff we do not do DUP again
@@ -93,16 +105,19 @@ PUSH0;          // 5f //        // [0x00]
 DUP1;           // 80 // [0x00, 0x00]
 REVERT;         // fd // []
 
-// 2.G Jumped from Func Dispacher Update: calldata[0:4] = 0xcdfead2e
+// 2.G Jumped from 2.D = Func Dispacher Update: calldata[0:4] = 0xcdfead2e
 JUMPDEST;       // 5B //        [calldata[0:4]]
-PUSH1 0x43;     // 57 43 //     [0x43, calldata[0:4]] 
-PUSH1 0x3f;     // 57 3f //     [0x3f, 0x43, calldata[0:4]]
-CALLDATASIZE;   // 36 //        [calldata_size, 0x3f, 0x43, calldata[0:4]]
-PUSH1 0x04;     // 57 04 //     [0x04, calldata_size, 0x3f, 0x43, calldata[0:4]]
+PUSH1 0x43;     // 57 43 //     [0x43, 0xcdfead2e] 
+PUSH1 0x3f;     // 57 3f //     [0x3f, 0x43, 0xcdfead2e]
+CALLDATASIZE;   // 36 //        [calldata_size, 0x3f, 0x43, 0xcdfead2e]
+PUSH1 0x04;     // 57 04 //     [0x04, calldata_size, 0x3f, 0x43, 0xcdfead2e]  // calldata_size = 24
 PUSH1 0x59;     // 57 59 //     [0x59, 0x04, calldata_size, 0x3f, 0x43, calldata[0:4]]
-JUMP;           // 56 //        [0x04, calldata_size, 0x3f, 0x43, calldata[0:4]] >> jump to 59
+JUMP;           // 56 //        [0x04, 24, 0x3f, 0x43, 0xcdfead2e] >> jump to 59
+// We JUMP
 
-// 2.H Jumped from Func Dispacher Read: calldata[0:4] = 0xe026c017
+// 2.H: SSTORE >> we jump here anytime we need to store
+// We jumpe from [0x3f,  7, 0x43, 0xcdfead2e]
+// Jumped from 1-Func Dispacher Read: calldata[0:4] = 0xe026c017
 JUMPDEST;       // 5b //        [0xe026c017]
 PUSH0;          // 5f //        [0x00, 0xe026c017]
 SSTORE;         // 55 //        
@@ -130,11 +145,12 @@ SUB;
 SWAP1;
 RETURN;
 
-// 2. Sol is checking if there are enough calldata 
-// cd must be at last 32bytes for execution of the function
-// Jumped from 2.G: Func Dispacher Update:  0xcdfead2e = calldata[0:4] =
-JUMPDEST;       // 5b //    [0x04, calldata_size, 0x3f, 0x43, 0xcdfead2e] 
-PUSH0;          // 5f //    [0x00, 0x04, calldata_size, 0x3f, 0x43, 0xcdfead2e]
+// 2. JUMP from 2.G: Sol is checking if there are enough calldata 
+// We Have function 4-bytes but the we have a number uint256 =  32bytes = 0x20 TOT 0x024
+// 2.G: Func Dispacher Update:  0xcdfead2e = calldata[0:4] =
+// Tot Call Data = 
+JUMPDEST;       // 5b //    [0x04, calldata_size, 0x3f, 0x43, 0xcdfead2e] = [0x04, 24, 0x3f, 0x43, 0xcdfead2e]
+PUSH0;          // 5f //    [0x00, 0x04, 24, 0x3f, 0x43, 0xcdfead2e]
 PUSH1 0x20;     // 60 20 // [0x20, 0x00, 0x04, calldata_size, 0x3f, 0x43, 0xcdfead2e]
 DUP3;           // 82 //    [0x04, 0x20, 0x00, 0x04, calldata_size, 0x3f, 0x43, 0xcdfead2e] 
 DUP5;           // 84 //    [calldata_size, 0x04, 0x20, 0x00, 0x04, calldata_size, 0x3f, 0x43, 0xcdfead2e]
@@ -142,21 +158,23 @@ SUB;            // 03 //    [calldata_size - 0x04, 0x20, 0x00, 0x04, calldata_si
 // SLT is basically checking if there is more calldata in addition to funct selector? 
 // 0x20 = 32bytes: SL If calldats size -04 < 32bytes  True = 1
 SLT;            // 12 //    [calldata_size - 0x04 < 0x20, 0x00, 0x04, calldata_size, 0x3f, 0x43, 0xcdfead2e]]
+// calldata_size - 0x04 < 0x20 == 24 - 4 < 20 ==== NO > 0: [0x00, 0x00, 0x04, calldata_size, 0x3f, 0x43, 0xcdfead2e]]]
 ISZERO;         // 15 //    [0x01, 0x00, 0x04, calldata_size, 0x3f, 0x43, 0xcdfead2e]]
 PUSH1 0x68;     // 60 68 // [0x68, 0x01, 0x04, calldata_size, 0x3f, 0x43, 0xcdfead2e]
 JUMPI;          // 57 //    [0x04, calldata_size, 0x3f, 0x43, 0xcdfead2e] // 0x01 >< 0 Then JUMP to 68
-// We are jumping 
+// We JUMPI: if >< 0 we jump: taht is 1 >> we jump to 68
 PUSH0;          // 5f //
 DUP1;           // 80 //
 REVERT;         // fd //
 
+// colldata_size = 24 (0x20=32 bytes for th7 + 0x04 for the function) = 0x24
 JUMPDEST;       // //       [0x04, calldata_size, 0x3f, 0x43, 0xcdfead2e]
 POP;                //      [calldata_size, 0x3f, 0x43, 0xcdfead2e]
-CALLDATALOAD;
-SWAP2;
-SWAP1;
-POP;
-JUMP;
+CALLDATALOAD;       //      [7, 24, 0x3f, 0x43, 0xcdfead2e]  
+SWAP2;                //    [0x3f, 24, 7, 0x43, 0xcdfead2e]
+SWAP1;              //      [24, 0x3f,  7, 0x43, 0xcdfead2e]
+POP;                //      [0x3f,  7, 0x43, 0xcdfead2e]
+JUMP;               //      [0x3f,  7, 0x43, 0xcdfead2e]
 
 INVALID
 LOG2;

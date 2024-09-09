@@ -15,7 +15,7 @@ We know there ae 3 sections;
 // Free Memory Pointer: this always at the start
 PUSH1 0x80; // [80]                             // 60 80
 PUSH1 0x40; // [80, 40]                         // 60 40
-MSTORE;     //                                  // 52: input: Top = offset =40 , bottom = size =80
+MSTORE;     // 52 //                                  // 52: input: Top = offset =40 , bottom = size =80
 
 // What this chunk do? Tells if NO value has been sent >> Jump to 0x0e PC JUMPDEST
 // If value has been sent (ISZERO == 0) >> mxt step >> REVERT: stop execution
@@ -107,45 +107,51 @@ REVERT;         // fd // []
 
 // 2.G Jumped from 2.D = Func Dispacher Update: calldata[0:4] = 0xcdfead2e
 JUMPDEST;       // 5B //        [calldata[0:4]]
-PUSH1 0x43;     // 57 43 //     [0x43, 0xcdfead2e] 
-PUSH1 0x3f;     // 57 3f //     [0x3f, 0x43, 0xcdfead2e]
+PUSH1 0x43;     // 60 43 //     [0x43, 0xcdfead2e] 
+PUSH1 0x3f;     // 60 3f //     [0x3f, 0x43, 0xcdfead2e]
 CALLDATASIZE;   // 36 //        [calldata_size, 0x3f, 0x43, 0xcdfead2e]
-PUSH1 0x04;     // 57 04 //     [0x04, calldata_size, 0x3f, 0x43, 0xcdfead2e]  // calldata_size = 24
-PUSH1 0x59;     // 57 59 //     [0x59, 0x04, calldata_size, 0x3f, 0x43, calldata[0:4]]
+PUSH1 0x04;     // 60 04 //     [0x04, calldata_size, 0x3f, 0x43, 0xcdfead2e]  // calldata_size = 24
+PUSH1 0x59;     // 60 59 //     [0x59, 0x04, calldata_size, 0x3f, 0x43, calldata[0:4]]
 JUMP;           // 56 //        [0x04, 24, 0x3f, 0x43, 0xcdfead2e] >> jump to 59
 // We JUMP
 
-// 2.H: SSTORE >> we jump here anytime we need to store
-// We jumpe from [0x3f,  7, 0x43, 0xcdfead2e]
+// 2.STORE: SSTORE >> we jump here anytime we need to store
+// We jumpe from 2.I [0x3f,  7, 0x43, 0xcdfead2e]
 // Jumped from 1-Func Dispacher Read: calldata[0:4] = 0xe026c017
 JUMPDEST;       // 5b //        [0xe026c017]
 PUSH0;          // 5f //        [0x00, 0xe026c017]
 SSTORE;         // 55 //        
-JUMP;           //    //
+JUMP;           // 56 //
 
 JUMPDEST;       // 5b // 
 STOP;
 
-// 2. Jumped from Func Dispacher Read: calldata[0:4] = 0xe026c017
-JUMPDEST;       // 5b // 
-PUSH0;
-SLOAD;
-PUSH1 0x40; 
-MLOAD;
-SWAP1;
-DUP2;
-MSTORE;
-PUSH1 0x20; 
-ADD;
-PUSH1 0x40; 
-MLOAD;
-DUP1;
-SWAP2;
-SUB;
-SWAP1;
-RETURN;
+// 2.F Jumped from  2.e >>Func Dispacher Read: calldata[0:4] == 0xe026c017 == Function Slector
+JUMPDEST;       // 5b //    [0xe026c017]
+PUSH0;          // 5f //    [0x00, 0xe026c017]
+SLOAD;          // 54 //    [numbHorses, 0xe026c017] // load FROM STORAGE in position 0x00 the value >> 7 = numb of Horses
+PUSH1 0x40;     // 60 40 // [0x40, 0x07,  0xe026c017]
+MLOAD;          // 51 //    [0x80, 0x07,  0xe026c017] // we load Free Memory Pointer info in position 40 we put 80 - set at the begininig 
+// we know that at Memory 40 we tell where free memory is: free memory is at 80
+// initially we set Free Pointer 0x40 0x80: in 40 we say 80 has free memory we can use
+SWAP1;          // 90 //    [0x07, 0x80, 0xe026c017] // 
+DUP2;           // 81 //    [0x80,0x07, 0x80, 0xe026c017] // DUP we duplicate and put at the TOP 
+// DUP2: Input a,b Output: b,a,b
+MSTORE;         // 52 //    stack: [0x80, 0xe026c017], memory: in 0x80: 0x07
+// We NEED TO RETURN THST NUMBER FROM MEMORY : MLOAD
+// No Need to Reset the FREE Mem Pointer: last op
+PUSH1 0x20;     // 60 20 // [0x20, 0x80, 0xe026c017]
+ADD;            // 01 //    [0xa0,0xe026c017]       //0x20 =32bytes, 0x80=128, cast tobase 160 hex = 0xa0
+PUSH1 0x40;     // 60 40 // [0x40, 0xa0,0xe026c017] 
+MLOAD;          // 51 //    [0x80, 0xa0, 0xe026c017]: MLOAD what is at 0x40 >> 0x80            // Memory [0x40: 0x80]
+DUP1;           // 80 //    [0x80, 0x80, 0xa0, 0xe026c017]
+SWAP2;          // 91 //    [0xa0, 0x80, 0x80, 0xe026c017]
+SUB;            // 03 //    [0x20, 0x80, 0xe026c017]   // 160-128=32bytes
+SWAP1;          // 90 //    [0x80, 0x20, 0xe026c017]
+// RETURN:  value of size 32(0x20) located at position 128(0x80) in memory: we put our value rthere
+RETURN;         // F3 //       [0xe026c017], return 0x07                         //We return from memory
 
-// 2. JUMP from 2.G: Sol is checking if there are enough calldata 
+// 2.H JUMP from 2.G: Sol is checking if there are enough calldata 
 // We Have function 4-bytes but the we have a number uint256 =  32bytes = 0x20 TOT 0x024
 // 2.G: Func Dispacher Update:  0xcdfead2e = calldata[0:4] =
 // Tot Call Data = 
@@ -167,7 +173,7 @@ PUSH0;          // 5f //
 DUP1;           // 80 //
 REVERT;         // fd //
 
-// colldata_size = 24 (0x20=32 bytes for th7 + 0x04 for the function) = 0x24
+// 2.I colldata_size = 24 (0x20=32 bytes for th7 + 0x04 for the function) = 0x24
 JUMPDEST;       // //       [0x04, calldata_size, 0x3f, 0x43, 0xcdfead2e]
 POP;                //      [calldata_size, 0x3f, 0x43, 0xcdfead2e]
 CALLDATALOAD;       //      [7, 24, 0x3f, 0x43, 0xcdfead2e]  
@@ -176,6 +182,7 @@ SWAP1;              //      [24, 0x3f,  7, 0x43, 0xcdfead2e]
 POP;                //      [0x3f,  7, 0x43, 0xcdfead2e]
 JUMP;               //      [0x3f,  7, 0x43, 0xcdfead2e]
 
+// 3 META DATA 
 INVALID
 LOG2;
 PUSH5 0x6970667358; 

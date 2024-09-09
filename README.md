@@ -16,6 +16,8 @@ $ forge install huff-language/foundry-huff --no-commit
 ```shell
 $ ffi = true
 ```
+This will allow to use/import the `{HuffDeplo}`
+
 #### Crating tests and running them:
 Wrote the following files:
 1. Base_TestV1.t.sol: abstract contract that contains all the tests

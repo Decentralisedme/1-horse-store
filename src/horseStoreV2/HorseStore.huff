@@ -1,0 +1,34 @@
+/* HorseStore Interface Functions*/
+#define function mintHorse()  nonpayable returns()
+#define function totalSupply() nonpayable returns(uint256)
+#define function feedHorse(uint256) nonpayable returns()
+#define function isHappyHorse(uint256) nonpayable returns(bool)
+#define function horseIdToFedTimeStamp(uint256) nonpayable returns(uint256)
+#define function HORSE_HAPPY_IF_FED_WITHIN() nonpayable returns(uint256)
+
+/* ERC721 Interface Functions*/
+#define function name() nonpayable returns(string)
+#define function symbol() nonpayable returns(string)
+#define function tokenURI(uint256) nonpayable returns (string)
+#define function balanceOf(address) nonpayable returns(uint256)
+#define function ownerOf(uint256) nonpayable returns (address)
+#define function Transfer(address, uint256) nonpayable returns()
+#define function TransferFrom(address, address, uint256) nonpayable returns()
+
+#define function safeTransferFrom(address, address, uint256, bytes) nonpayable returns()
+#define function safeTransferFrom(address, address, uint256) nonpayable returns()
+#define function function transferFrom(address, address, uint256) nonpayable returns()
+#define function approve(address, uint256) nonpayable returns()
+#define function setApprovalForAll(address, bool) nonpayable returns();
+#define function getApproved(uint256) nonpayable returns(address)
+#define function isApprovedForAll(address, address) nonpayable returns (bool)
+
+/* Events */
+#define event Transfer(address, address, uint256)
+#define event Approval(address, address, uint256)
+#define event ApprovalForAll(address, address, bool);
+
+
+#define constant NUMBER_OF_STORAGE_SLOT = FREE_STORAGE_POINTER() // 0
+#define constant NFT_NAME = "HorseStore"
+#define constant NFT_SYMBOL = "HS"

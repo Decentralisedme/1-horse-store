@@ -4,7 +4,10 @@ out = "out"
 libs = ["lib"]
 ffi = true
 
-remapping = ['foundry-huff=lib/foundry-huff/src']
+remapping = [
+    'foundry-huff=lib/foundry-huff/src',
+    '@openzeppelin/=lib/openzeppelin-contracts/',
+]
 evm_version = 'shanghai'
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

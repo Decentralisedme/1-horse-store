@@ -29,8 +29,8 @@ $ function testReadValue() public {}
 $ function testWriteValue() public {}
 ```
 
-2. HorseStoreSolc.t.sol: contract is Base_TestV1, use to test solidity contracts
-3. HorseStoreHuff.t.sol: contract is Base_TestV1, use to test huff contracts
+2. HorseStoreSolc.t.sol: contract is Base_TestV1, used to test solidity contracts
+3. HorseStoreHuff.t.sol: contract is Base_TestV1, used to test huff contracts
 
 To run the tests you can simply:
 ```shell
@@ -44,7 +44,13 @@ With debag you can check the steps on each Opcode -
 ```shell
 $ forge test --match-path *Huff* --debug testReadValue -vvv
 ```
-
+## Huff
+Give us the contract deployment
+## Yul
+We have inline assembly yul where we use yul in solidity,and we have stand alone Yul where we only ise Yul.
+Install extension: Solidity + Yul Semantic Syntax
+Yul has not `contracts` but `objects`
+We need to write our contract deployment
 
 
 

@@ -1,10 +1,11 @@
-# Horse Store
+# Horse Store V1
 1. write basic simplestorage/horsestore
 
 #### Process
 1. I send the data
 2. Dispacher selects the function
 3. Dispacher sends the data to the funciton
+
 
 ## Tests
 #### Set-up:
@@ -51,6 +52,17 @@ We have inline assembly yul where we use yul in solidity,and we have stand alone
 Install extension: Solidity + Yul Semantic Syntax
 Yul has not `contracts` but `objects`
 We need to write our contract deployment
+
+
+# Horse Store V2
+In version 2, HorseStore is a ERC721 contract so there are few considerations:
+- ERC721 Interface Functions need to be declared:
+```shell
+$ '#'define function Transfer(address, uint256) nonpayable returns()
+```
+- ERC721 Interfaces Events need to declared
+- Storage Slots to be delared as constants
+- Immutable offsets also to be declared as constans
 
 
 

@@ -1,34 +1,86 @@
-/* HorseStore Interface Functions*/
+/* 
+Tools:
+- Get the Function Signature: cast sig "isHappyHorse(uint256)"
+- huffmate
+*/
+
+/* Imports */
+#include "../../lib/huffmate/src/data-structures/Hashmap.huff"
+
+// FROM CONTRACT
+// - Functions list (insert as interface):
+// - - mintHorse() = 0x61fc6a67
+// - - feedHorse(uint256 horseId) = 0xc65e2eaa
+// - - isHappyHorse(uint256 horseId) = 0x62134726
+// - Public Variables: (they turn in getter funct)
+// - - HORSE_HAPPY_IF_FED_WITHIN = 0x8c1d96ae ????????
+// - - horseIdToFedTimeStamp(uint256 horseId) = 0xf163af78
+
+/* HorseStore Interface */
 #define function mintHorse()  nonpayable returns()
-#define function totalSupply() nonpayable returns(uint256)
 #define function feedHorse(uint256) nonpayable returns()
 #define function isHappyHorse(uint256) nonpayable returns(bool)
 #define function horseIdToFedTimeStamp(uint256) nonpayable returns(uint256)
 #define function HORSE_HAPPY_IF_FED_WITHIN() nonpayable returns(uint256)
+#define function totalSupply() nonpayable returns(uint256)
 
-/* ERC721 Interface Functions*/
-#define function name() nonpayable returns(string)
-#define function symbol() nonpayable returns(string)
-#define function tokenURI(uint256) nonpayable returns (string)
-#define function balanceOf(address) nonpayable returns(uint256)
-#define function ownerOf(uint256) nonpayable returns (address)
-#define function Transfer(address, uint256) nonpayable returns()
-#define function TransferFrom(address, address, uint256) nonpayable returns()
+/* Storge Slot */
+#define constant HORSE_FED_TIMESTAMP_LOCATION = FREE_STORAGE_POINTER() // Mapping Free Storage
 
-#define function safeTransferFrom(address, address, uint256, bytes) nonpayable returns()
-#define function safeTransferFrom(address, address, uint256) nonpayable returns()
-#define function function transferFrom(address, address, uint256) nonpayable returns()
-#define function approve(address, uint256) nonpayable returns()
-#define function setApprovalForAll(address, bool) nonpayable returns();
-#define function getApproved(uint256) nonpayable returns(address)
-#define function isApprovedForAll(address, address) nonpayable returns (bool)
+// Macro_1: FeedHorse
+#define function FEED_HORSE() = takes(0) returns(0){
+    // we have a mapping with time stamp
+    timestamp   // 42 //            // [timestamp]
+    0x04                            // [0x04, timestamp]
+    calldataload    // 35 //        // [horseId, timestamp] >> horseId: is the argiment of the function: calldata = Funct Selec + uint256 (horseId)
+    // Store horseId and Timestamp for the Mapping
+    [HORSE_FED_TIMESTAMP_LOCATION]  // [HORSE_FED_TIMESTAMP_LOCATION, horseId, timestamp] 
+    // huffmate has macro: STORE_ELEMENT_FROM_KEYS(mem_ptr) takes(3)
+    STORE_ELEMENT_FROM_KEYS(0x00) //huffmate// []: it retune (0), and argument (0x00) is location mem pointer
+    stop
+}
+// Macro_2 GET_HORSE_FED_TIMESTAMP() // getter function to get timestamp according to HorseId
+#define function GET_HORSE_FED_TIMESTAMP() = takes(0) results(0) {
+    0x04 calldataload               // [horseId]
+    // Here we need to get the Element, not store, using huffmate
+    [HORSE_FED_TIMESTAMP_LOCATION]  // [HORSE_FED_TIMESTAMP_LOCATION, horseId]
+    LOAD_ELEMENT_FROM_KEYS(0x00)    // [HorseFedTimestamp]
+    // Need to store in memory and Return it
+    0x00 mstore                     // stack: [] memory: [0x00: HorseFedTimestamp]
+    0x20 0x00 return                // []
 
-/* Events */
-#define event Transfer(address, address, uint256)
-#define event Approval(address, address, uint256)
-#define event ApprovalForAll(address, address, bool);
+}
+
+// MAIN
+// - Function Selector
+#define function MAIN() = takes(0) retunrs(0){
+    0x00
+    calldataload
+    0xe0
+    shr                         // [funct_select]  
+    // FUNCT SELECTOR: all the funct
+    dup1 __FUNC_SIG(mintHorse) eq mintHorse jumpi
+    // Check Funct feedHorse =0xc65e2eaa
+    dup1                         // [funct_select, funct_select]
+    __FUNC_SIG(feedHorse)       // [0xc65e2eaa, funct_select, funct_selec]
+    eq                          // if 0xc65e2eaa == funct_select then 1, otherwise 0
+    feedHorse   // Jump Dest//  //  [JumpDest, 1 or 0, funct_selector]          
+    jumpi                       // If ><0 Then Jump, otherwise nxt
+    dup1 __FUNC_SIG(isHappyHorse) eq isHappyHorse jumpi
+    dup1 __FUNC_SIG(horseIdToFedTimeStamp) eq horseIdToFedTimeStamp jumpi
+    dup1 __FUNC_SIG(HORSE_HAPPY_IF_FED_WITHIN) eq horseHappyFedWithin jumpi
 
 
-#define constant NUMBER_OF_STORAGE_SLOT = FREE_STORAGE_POINTER() // 0
-#define constant NFT_NAME = "HorseStore"
-#define constant NFT_SYMBOL = "HS"
+    // JUMP DEST: 
+    feedHorse:
+        FEED_HORSE()
+    mintHorse:
+        MINT_HORSE()
+    isHappyHorse:
+        IS_HAPPY_HORSE()
+    horseIdToFedTimeStamp:
+        GET_HORSE_FED_TIMESTAMP()
+    horseHappyFedWithin:
+        HORSE_HAPPY_FED_WITHIN()
+
+}

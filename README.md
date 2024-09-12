@@ -1,10 +1,25 @@
-# Horse Store
+# Intro to lower lavel bytecode
+The exercise is to develop same contract in 3 different langs: Solidity, Yul and Huff.
+This is of great help to learn lower lvel langs and also to get a clear undestanding of EVM behivor specally when it comes down to stack, storage, memory and how they interact. 
+
+## Tools:
+These are tools which I found very usefull:
+-   **Scripts**:
+- Get the Function Signature: `cast sig "isHappyHorse(uint256)"`
+- Conversion Hex to Dex and viceversa: `cast to-base 0x15180 dec`
+- Foundry chisel: REPL 
+- Test debug: `forge test --debug`
+- huffmate: import Hashmap.huff / CommonErrors.huff
+
+
+# Horse Store V1
 1. write basic simplestorage/horsestore
 
 #### Process
 1. I send the data
 2. Dispacher selects the function
 3. Dispacher sends the data to the funciton
+
 
 ## Tests
 #### Set-up:
@@ -51,6 +66,17 @@ We have inline assembly yul where we use yul in solidity,and we have stand alone
 Install extension: Solidity + Yul Semantic Syntax
 Yul has not `contracts` but `objects`
 We need to write our contract deployment
+
+
+# Horse Store V2
+In version 2, HorseStore is a ERC721 contract so there are few considerations:
+- ERC721 Interface Functions need to be declared:
+```shell
+$ '#'define function Transfer(address, uint256) nonpayable returns()
+```
+- ERC721 Interfaces Events need to declared
+- Storage Slots to be delared as constants
+- Immutable offsets also to be declared as constans
 
 
 

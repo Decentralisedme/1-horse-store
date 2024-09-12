@@ -1,0 +1,113 @@
+// /* Imports */
+// #include "../../lib/huffmate/src/data-structures/Hashmap.huff"
+
+// /* HorseStore Interface Functions*/
+// #define function mintHorse()  nonpayable returns()
+// #define function totalSupply() nonpayable returns(uint256)
+// #define function feedHorse(uint256) nonpayable returns()
+// #define function isHappyHorse(uint256) nonpayable returns(bool)
+// #define function horseIdToFedTimeStamp(uint256) nonpayable returns(uint256)
+// #define function HORSE_HAPPY_IF_FED_WITHIN() nonpayable returns(uint256)
+
+// /* ERC721 Interface Functions */
+// #define function name() nonpayable returns(string)
+// #define function symbol() nonpayable returns(string)
+// #define function tokenURI(uint256) nonpayable returns (string)
+// #define function balanceOf(address) nonpayable returns(uint256)
+// #define function ownerOf(uint256) nonpayable returns (address)
+// #define function Transfer(address, uint256) nonpayable returns()
+// #define function TransferFrom(address, address, uint256) nonpayable returns()
+
+// #define function safeTransferFrom(address, address, uint256, bytes) nonpayable returns()
+// #define function safeTransferFrom(address, address, uint256) nonpayable returns()
+// #define function function transferFrom(address, address, uint256) nonpayable returns()
+// #define function approve(address, uint256) nonpayable returns()
+// #define function setApprovalForAll(address, bool) nonpayable returns();
+// #define function getApproved(uint256) nonpayable returns(address)
+// #define function isApprovedForAll(address, address) nonpayable returns (bool)
+
+// /* ERC721 Events */
+// #define event Transfer(address, address, uint256)
+// #define event Approval(address, address, uint256)
+// #define event ApprovalForAll(address, address, bool);
+
+// /* Storage Sloat */
+// #define constant TOTAL_SUPPLY = FREE_STORAGE_POINTER()
+// #define constant HORSE_FED_TIMESTAMP_LOCATION = FREE_STORAGE_POINTER()
+
+
+
+// /* Immutable Offset */
+// #define constant NAME_OFFSET = 
+// #define constant NAME_LENGTH_OFFSET = 
+// #define constant SYMBOL_OFFSET = 
+// #define constant SYMBOL_LENGTH_OFFSET =
+
+// /* Constant */ 
+// // 1-day = 86400 sec >> to-base == 0x15180
+// #define constant HORSE_HAPPY_IF_FEF_WITHIN_CONST = 0000000000000000000000000000000000000000000000000000000000015180
+
+
+// #define macro MAIN() = takes(0) returns(0) {
+//     // Function selector
+//     0x00
+//     calldataload    // [35] //      // [calldata,0x00]
+//     0xe0                            // [0xe0, calldata, 0x00]   
+//     shr             // 1c //        // [FunctSelector]
+//     // Funct Selector is what we get from the calldata
+//     // we now need to get the one in the contract so we can compare Eq
+//     // get Funct Sig
+//     dup1            // 80 //
+//     // Get Funct sig from funct name: 
+//     __FUNC_SIG(feedHorse)
+//     eq              // 14 //
+
+// }
+// // HorseStoreV2 Methods:
+// #define macro GET_TOTAL_SUPPLY() = takes(0) returns(0){
+//     [TOTAL_SUPPLY]          // [Key]
+//     sload       // 54 //    // [tot_sup] //load from Storage at position Key 
+//     0x00                    // [0x00, tot_sup]
+//     mstore      // 52 //    // stack: [], memory: [tot_sup]
+//     0x20                    // [0x20]
+//     0x00                    // [0x00 0x20] ?????
+//     return      // f3 //    // [] return 32bytes which takes at position 0x00 in Memory
+// }
+
+// #define macro HORSE_HAPPY_IF_FED_WITHIN() = takes(0) returns(0) {
+//     [HORSE_HAPPY_IF_FEF_WITHIN_CONST]   // [0x15180]
+//     0x00                                // [0x00, 0x15180]
+//     mstore                              // stack [], memory [0x15180]
+//     0x20
+//     0x00                                // [0x00, 0x20]
+//     return      // f3 //                // [] return 32-bytes value
+// }
+
+// #define macro GET_HORSE_FED_TIMESAMP() = takes(0) returns(0) {
+//     0x04                            // [0x04] 
+//     calldataload    // 35 //        // [horseId]>>>calldataload, 0x04
+//     [HORSE_FED_TIMESTAMP_LOCATION]  // [Location,HorseId]
+//     LOAD_ELEMENT_FROM_KEYS(0x00)    // [HorseFedTimestamp]
+//     0x00
+//     mstore
+//     0x20
+//     0x00
+//     return
+
+// }
+
+// #define macro MINT_HORSES() = takes(0) returns(0) {
+
+// }
+
+// /////////////////////
+// // INTERNAL FUNCTIONS
+// /////////////////////
+
+// #define macro _MINT() = takes(2) retirns(0){
+//     // Input: Stack
+//     // Output: Stack
+// }
+
+
+

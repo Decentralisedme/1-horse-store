@@ -1,6 +1,6 @@
 # Intro to lower lavel bytecode
 The exercise is to develop same contract in 3 different langs: Solidity, Yul and Huff.
-This is of great help to learn lower lvel langs and also to get a clear undestanding of EVM behivor specally when it comes down to stack, storage, memory and how they interact. 
+This is of great help to learn lower lvel langs and also to get a clear undestanding of EVM behivor specally when it comes down to stack, storage, memory and how they interact via stack syntax.
 
 ## Tools:
 These are tools which I found very usefull:

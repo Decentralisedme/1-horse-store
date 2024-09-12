@@ -1,3 +1,17 @@
+# Intro to lower lavel bytecode
+The exercise is to develop same contract in 3 different langs: Solidity, Yul and Huff.
+This is of great help to learn lower lvel langs and also to get a clear undestanding of EVM behivor specally when it comes down to stack, storage, memory and how they interact. 
+
+## Tools:
+These are tools which I found very usefull:
+-   **Scripts**:
+- Get the Function Signature: `cast sig "isHappyHorse(uint256)"`
+- Conversion Hex to Dex and viceversa: `cast to-base 0x15180 dec`
+- Foundry chisel: REPL 
+- Test debug: `forge test --debug`
+- huffmate: import Hashmap.huff / CommonErrors.huff
+
+
 # Horse Store V1
 1. write basic simplestorage/horsestore
 

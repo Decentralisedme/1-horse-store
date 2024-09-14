@@ -30,7 +30,12 @@ $ forge install huff-language/foundry-huff --no-commit
 2. Foundry.toml to be updated: 
 ```shell
 $ ffi = true
+$ remappings = [
+    'foundry-huff=lib/foundry-huff/src',
+    '@openzeppelin/=lib/openzeppelin-contracts/',
+]
 ```
+
 This will allow to use/import the `{HuffDeplo}`
 
 #### Crating tests and running them:

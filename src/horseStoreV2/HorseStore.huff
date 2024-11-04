@@ -71,7 +71,7 @@ Tools:
     timestamp                       // [timestamp, HorseFedTimestamp]
     dup2 dup2                       // [timestamp, HorseFedTimestamp,timestamp, HorseFedTimestamp]
     sub                             // [timestamp - HorseFedTimestamp,timestamp, HorseFedTimestamp]
-    [ HORSE_HAPPY_IF_FED_WITHIN_CONST]  //  [HORSE_HAPPY_IF_FEF_WITHIN_CONST, (timestamp - HorseFedTimestamp), timestamp, HorseFedTimestamp]
+    [HORSE_HAPPY_IF_FED_WITHIN_CONST]  //  [HORSE_HAPPY_IF_FEF_WITHIN_CONST, (timestamp - HorseFedTimestamp), timestamp, HorseFedTimestamp]
     gt                                  //  [HORSE_HAPPY_IF_FEF_WITHIN_CONST > (timestamp - HorseFedTimestamp),timestamp, HorseFedTimestamp]
     start_return_true jumpi             // [timestamp, HorseFedTimestamp]
     eq  // this returns 1 if == //      // [timestamp == HorseFedTimestamp] // True or False
